@@ -1,23 +1,32 @@
-name: C/C++ CI
+name: Build Dumper EXE
 
 on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+  workflow_dispatch: # This adds the "Run workflow" button
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: configure
-      run: ./configure
-    - name: make
-      run: make
-    - name: make check
-      run: make check
-    - name: make distcheck
-      run: make distcheck
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Restore NuGet packages
+      run: nuget restore GH-Offset-Dumper.sln
+
+    - name: Build Solution
+      # Building as x86 for CS 1.6 compatibility
+      run: msbuild GH-Offset-Dumper.sln /p:Configuration=Release /p:Platform=x86
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: GH-Dumper-Executable
+        # This will find any .exe or .dll created anywhere in the folder
+        path: |
+          **/*.exe
+          **/*.dll
+        if-no-files-found: error
