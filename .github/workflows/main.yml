@@ -18,12 +18,12 @@ jobs:
       run: nuget restore GH-Offset-Dumper.sln
 
     - name: Build Solution
-      run: msbuild GH-Offset-Dumper.sln /p:Configuration=Release /p:Platform=x64
+      run: msbuild GH-Offset-Dumper.sln /p:Configuration=Release /p:Platform=x86
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
         name: GH-Dumper-Executable
         path: |
-          **/*.exe
-          **/*.dll
+          **/Release/*.exe
+          **/Release/*.dll
