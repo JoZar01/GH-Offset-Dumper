@@ -1,7 +1,7 @@
 name: Build Dumper EXE
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # This adds the "Run workflow" button
 
 jobs:
   build:
@@ -18,12 +18,15 @@ jobs:
       run: nuget restore GH-Offset-Dumper.sln
 
     - name: Build Solution
+      # Building as x86 for CS 1.6 compatibility
       run: msbuild GH-Offset-Dumper.sln /p:Configuration=Release /p:Platform=x86
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
         name: GH-Dumper-Executable
+        # This will find any .exe or .dll created anywhere in the folder
         path: |
-          **/Release/*.exe
-          **/Release/*.dll
+          **/*.exe
+          **/*.dll
+        if-no-files-found: error
